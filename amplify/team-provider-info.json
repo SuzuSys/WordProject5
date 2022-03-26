@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-wordproject3-dev-201440-authRole",
+      "UnauthRoleArn": "arn:aws:iam::137340531829:role/amplify-wordproject3-dev-201440-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::137340531829:role/amplify-wordproject3-dev-201440-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-wordproject3-dev-201440-deployment",
+      "UnauthRoleName": "amplify-wordproject3-dev-201440-unauthRole",
+      "StackName": "amplify-wordproject3-dev-201440",
+      "StackId": "arn:aws:cloudformation:us-east-1:137340531829:stack/amplify-wordproject3-dev-201440/7798b640-97be-11ec-b7c0-0e35e849f84b",
+      "AmplifyAppId": "d3rowyzmrljtff"
+    },
+    "categories": {
+      "auth": {
+        "wordproject3420c3ca3420c3ca3": {}
+      }
+    }
+  }
+}
