@@ -2,11 +2,11 @@
 import { DefineLocaleMessage } from "vue-i18n";
 
 declare module "vue-i18n" {
-  // define the locale messages schema
   export interface DefineLocaleMessage {
-    label: string;
     AppChild: {
-      HelloWorld: string;
+      sentence: {
+        translation: string;
+      };
     };
   }
 }

@@ -1,6 +1,8 @@
 {
   "label": "日本語",
   "AppChild": {
-    "HelloWorld": "こんにちは、世界！"
+    "sentence": {
+      "translation": "言語"
+    }
   }
 }

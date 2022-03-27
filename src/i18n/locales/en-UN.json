@@ -1,6 +1,8 @@
 {
   "label": "English",
   "AppChild": {
-    "HelloWorld": "Hello, World!"
+    "sentence": {
+      "translation": "Translation"
+    }
   }
 }
