@@ -1,3 +1,6 @@
 {
-  "world": "the world!"
+  "label": "日本語",
+  "AppChild": {
+    "HelloWorld": "こんにちは、世界！"
+  }
 }

@@ -2,9 +2,17 @@ import { createI18n } from "vue-i18n";
 import enUS from "./locales/en-UN.json";
 import jaJP from "./locales/ja-JP.json";
 
-type MessageSchema = typeof enUS;
+interface VItem {
+  value: string;
+  label: string;
+}
 
-const i18n = createI18n<[MessageSchema], "en-US" | "ja-JP">({
+export const list_languages: VItem[] = [
+  { value: "en-US", label: "English" },
+  { value: "ja-JP", label: "日本語" },
+];
+
+const i18n = createI18n<false>({
   locale: "en-US",
   fallbackLocale: "en-US",
   messages: {

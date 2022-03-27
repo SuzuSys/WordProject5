@@ -1,8 +1,6 @@
 <template>
   <authenticator>
-    <v-app>
-      <h1>{{ t("world") }}</h1>
-    </v-app>
+    <app-child></app-child>
   </authenticator>
 </template>
 
@@ -14,11 +12,13 @@ import { Amplify } from "aws-amplify";
 import awsconfig from "./aws-exports";
 Amplify.configure(awsconfig);
 import { useI18n } from "vue-i18n";
+import AppChild from "./AppChild.vue";
 
 export default defineComponent({
   name: "App",
   components: {
     Authenticator,
+    AppChild,
   },
   setup() {
     const { t } = useI18n();
