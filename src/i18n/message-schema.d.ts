@@ -7,6 +7,12 @@ declare module "vue-i18n" {
       sentence: {
         translation: string;
       };
+      error: {
+        load_user_info: string;
+      };
+      method: {
+        load_user_info: string;
+      };
     };
   }
 }

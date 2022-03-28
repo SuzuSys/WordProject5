@@ -3,6 +3,12 @@
   "AppChild": {
     "sentence": {
       "translation": "Translation"
+    },
+    "error": {
+      "load_user_info": "Failed to get user infomation."
+    },
+    "method": {
+      "load_user_info": "Get info again"
     }
   }
 }

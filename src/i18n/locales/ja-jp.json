@@ -3,6 +3,12 @@
   "AppChild": {
     "sentence": {
       "translation": "言語"
+    },
+    "error": {
+      "load_user_info": "ユーザー情報の取得に失敗しました。"
+    },
+    "method": {
+      "load_user_info": "再取得する"
     }
   }
 }

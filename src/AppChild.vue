@@ -47,6 +47,22 @@
       </v-list>
     </v-navigation-drawer>
     <v-main>
+      <v-alert
+        variant="outlined"
+        density="compact"
+        type="error"
+        v-show="state.show.alert.error.load_user_info"
+      >
+        {{ t("AppChild.error.load_user_info") }}
+        <v-btn
+          size="small"
+          variant="contained"
+          @click="asyncLoadUser"
+          :disabled="state.disabled.btn.reload_user_info"
+        >
+          {{ t("AppChild.method.load_user_info") }}
+        </v-btn>
+      </v-alert>
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -54,10 +70,11 @@
 
 <script lang="ts">
 import { defineComponent, reactive } from "vue";
-import { useAuthenticator } from "@aws-amplify/ui-vue";
+import { Auth } from "aws-amplify";
 import { useI18n } from "vue-i18n";
 import { list_languages } from "@/i18n";
 import { RouterView, useRouter, useRoute } from "vue-router";
+import { useUserStore } from "@/stores/user";
 
 interface State {
   model: {
@@ -66,6 +83,18 @@ interface State {
     };
     menu: {
       show_languages_list: boolean;
+    };
+  };
+  show: {
+    alert: {
+      error: {
+        load_user_info: boolean;
+      };
+    };
+  };
+  disabled: {
+    btn: {
+      reload_user_info: boolean;
     };
   };
 }
@@ -81,11 +110,6 @@ export default defineComponent({
       useScope: "global",
       inheritLocale: true,
     });
-    const { user } = useAuthenticator();
-    const user_language = user.attributes["custom:language"];
-    if (typeof user_language === "string") {
-      locale.value = user_language;
-    }
     // State Setting
     const state: State = reactive<State>({
       model: {
@@ -96,13 +120,47 @@ export default defineComponent({
           show_languages_list: false,
         },
       },
+      show: {
+        alert: {
+          error: {
+            load_user_info: false,
+          },
+        },
+      },
+      disabled: {
+        btn: {
+          reload_user_info: false,
+        },
+      },
     });
+    // UserStore setting
+    const user_store = useUserStore();
+    asyncLoadUser();
     // Method Setting
     function changeLanguage(v: string): void {
       locale.value = v;
       state.model.menu.show_languages_list = false;
     }
-    // GoLink Method Setting
+    async function asyncLoadUser(): Promise<void> {
+      state.disabled.btn.reload_user_info = true;
+      try {
+        const user = await Auth.currentUserInfo();
+        user_store.init(
+          user.attributes.email,
+          user.attributes.email_verified,
+          user.attributes.name,
+          user.attributes["custom:language"]
+        );
+        locale.value = user_store.language;
+        state.show.alert.error.load_user_info = false;
+      } catch (e) {
+        console.error(e);
+        state.show.alert.error.load_user_info = true;
+      } finally {
+        state.disabled.btn.reload_user_info = false;
+      }
+    }
+    // Router Method Setting
     const router = useRouter();
     const route = useRoute();
     function goAccount(): void {
@@ -124,6 +182,7 @@ export default defineComponent({
       state,
       list_languages,
       changeLanguage,
+      asyncLoadUser,
       goAccount,
       goDashboard,
     };
