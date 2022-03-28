@@ -63,7 +63,9 @@
           {{ t("AppChild.method.load_user_info") }}
         </v-btn>
       </v-alert>
-      <router-view></router-view>
+      <router-view
+        v-show="state.show.router_view.loaded_user_info"
+      ></router-view>
     </v-main>
   </v-app>
 </template>
@@ -90,6 +92,9 @@ interface State {
       error: {
         load_user_info: boolean;
       };
+    };
+    router_view: {
+      loaded_user_info: boolean;
     };
   };
   disabled: {
@@ -126,6 +131,9 @@ export default defineComponent({
             load_user_info: false,
           },
         },
+        router_view: {
+          loaded_user_info: true,
+        },
       },
       disabled: {
         btn: {
@@ -153,8 +161,10 @@ export default defineComponent({
         );
         locale.value = user_store.language;
         state.show.alert.error.load_user_info = false;
+        state.show.router_view.loaded_user_info = true;
       } catch (e) {
         console.error(e);
+        state.show.router_view.loaded_user_info = false;
         state.show.alert.error.load_user_info = true;
       } finally {
         state.disabled.btn.reload_user_info = false;
