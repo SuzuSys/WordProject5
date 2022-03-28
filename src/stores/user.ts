@@ -16,7 +16,8 @@ export const useUserStore = defineStore({
       language: string | undefined
     ) {
       if (typeof email === "string") this.email = email;
-      if (typeof email_verified === "string") this.email_verified = email_verified;
+      if (typeof email_verified === "string")
+        this.email_verified = email_verified;
       if (typeof name === "string") this.name = name;
       if (typeof language === "string") this.language = language;
     },
