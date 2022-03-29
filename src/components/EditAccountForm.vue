@@ -138,12 +138,22 @@
         </v-alert>
         <!-- change password btn -->
         <v-btn
-          @click="switchChangePasswordForm"
+          @click="state.show.form.change_password = true"
           variant="outlined"
           block
           class="my-2 mx-0"
+          v-show="!state.show.form.change_password"
         >
-          {{ state.show.form.change_password ? "cancel" : "change password" }}
+          change password
+        </v-btn>
+        <v-btn
+          block
+          variant="contained-text"
+          @click="closeChangePasswordForm"
+          class="my-2 mx-0"
+          v-show="state.show.form.change_password"
+        >
+          Cancel
         </v-btn>
         <!-- change password form -->
         <v-form v-show="state.show.form.change_password">
@@ -432,14 +442,12 @@ export default defineComponent({
         state.disabled.btn.request_resend_email_verification_code = false;
       }
     }
-    function switchChangePasswordForm(): void {
-      if (state.show.form.change_password) {
-        state.model.text_field.password_old = "";
-        state.model.text_field.password_new = "";
-        state.show_password_old = false;
-        state.show_password_new = false;
-      }
-      state.show.form.change_password = !state.show.form.change_password;
+    function closeChangePasswordForm(): void {
+      state.model.text_field.password_old = "";
+      state.model.text_field.password_new = "";
+      state.show_password_old = false;
+      state.show_password_new = false;
+      state.show.form.change_password = false;
     }
     async function changePassword(): Promise<void> {
       state.disabled.btn.change_password = true;
@@ -483,7 +491,7 @@ export default defineComponent({
       updateEmail,
       sendEmailVerificationCode,
       requestResendVerificationCode,
-      switchChangePasswordForm,
+      closeChangePasswordForm,
       changePassword,
     };
   },
