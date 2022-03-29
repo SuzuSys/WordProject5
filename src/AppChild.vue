@@ -63,9 +63,17 @@
           {{ t("AppChild.method.load_user_info") }}
         </v-btn>
       </v-alert>
-      <router-view
-        v-show="state.show.router_view.loaded_user_info"
-      ></router-view>
+      <v-overlay
+        :model-value="state.model_value.overlay.loading"
+        class="align-center justify-center"
+      >
+        <v-progress-circular
+          :size="50"
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
+      </v-overlay>
+      <router-view v-if="state.if.router_view.loaded_user_info"></router-view>
     </v-main>
   </v-app>
 </template>
@@ -79,6 +87,11 @@ import { RouterView, useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/user";
 
 interface State {
+  model_value: {
+    overlay: {
+      loading: boolean;
+    };
+  };
   model: {
     drawer: {
       show_drawer: boolean;
@@ -93,6 +106,8 @@ interface State {
         load_user_info: boolean;
       };
     };
+  };
+  if: {
     router_view: {
       loaded_user_info: boolean;
     };
@@ -117,6 +132,11 @@ export default defineComponent({
     });
     // State Setting
     const state: State = reactive<State>({
+      model_value: {
+        overlay: {
+          loading: false,
+        },
+      },
       model: {
         drawer: {
           show_drawer: false,
@@ -131,8 +151,10 @@ export default defineComponent({
             load_user_info: false,
           },
         },
+      },
+      if: {
         router_view: {
-          loaded_user_info: true,
+          loaded_user_info: false,
         },
       },
       disabled: {
@@ -151,6 +173,7 @@ export default defineComponent({
     }
     async function asyncLoadUser(): Promise<void> {
       state.disabled.btn.reload_user_info = true;
+      state.model_value.overlay.loading = true;
       try {
         const user = await Auth.currentUserInfo();
         const {
@@ -162,13 +185,14 @@ export default defineComponent({
         user_store.init(email, email_verified, name, language);
         locale.value = user_store.language;
         state.show.alert.error.load_user_info = false;
-        state.show.router_view.loaded_user_info = true;
+        state.model_value.overlay.loading = false;
+        state.if.router_view.loaded_user_info = true;
       } catch (e) {
         console.error(e);
-        state.show.router_view.loaded_user_info = false;
         state.show.alert.error.load_user_info = true;
       } finally {
         state.disabled.btn.reload_user_info = false;
+        state.model_value.overlay.loading = false;
       }
     }
     // Router Method Setting
