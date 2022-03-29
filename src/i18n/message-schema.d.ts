@@ -14,5 +14,25 @@ declare module "vue-i18n" {
         load_user_info: string;
       };
     };
+    EditAccountForm: {
+      error: {
+        request_resend_email_verification_code: string;
+        mismatch_email_verification_code: string;
+        update_email: string;
+      };
+      success: {
+        update_email: string;
+      };
+      warning: {
+        email_not_verified_yet: string;
+      };
+      info: {
+        sent_email_verification_code: string;
+        sent_email_verification_code_again: string;
+      };
+      method: {
+        request_resend_email_verification_code: string;
+      };
+    };
   }
 }

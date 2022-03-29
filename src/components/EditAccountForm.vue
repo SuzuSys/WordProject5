@@ -35,7 +35,7 @@
           class="my-2"
           variant="outlined"
         >
-          AAA
+          {{ t("EditAccountForm.warning.email_not_verified_yet") }}
         </v-alert>
         <!-- we sent email varification code -->
         <v-alert
@@ -45,7 +45,7 @@
           class="my-2"
           variant="outlined"
         >
-          AAA
+          {{ t("EditAccountForm.info.sent_email_verification_code") }}
         </v-alert>
         <!-- email varification code -->
         <v-form v-show="state.show.form$btn.email_verification_code">
@@ -80,17 +80,19 @@
           v-show="state.show.form$btn.email_verification_code"
           :disabled="state.disabled.btn.request_resend_email_verification_code"
         >
-          TTT
+          {{
+            t("EditAccountForm.method.request_resend_email_verification_code")
+          }}
         </v-btn>
         <!-- sent the code again -->
         <v-alert
-          type="success"
+          type="info"
           density="compact"
           class="my-2"
           variant="outlined"
           v-show="state.show.alert.info.sent_email_verification_code_again"
         >
-          TTT
+          {{ t("EditAccountForm.info.sent_email_verification_code_again") }}
         </v-alert>
         <!-- An error occurred while requesting resend the code -->
         <v-alert
@@ -100,7 +102,9 @@
           variant="outlined"
           v-show="state.show.alert.error.request_resend_email_verification_code"
         >
-          TTT
+          {{
+            t("EditAccountForm.error.request_resend_email_verification_code")
+          }}
         </v-alert>
         <!-- the code you input is not match -->
         <v-alert
@@ -110,7 +114,7 @@
           class="my-2"
           variant="outlined"
         >
-          TTT
+          {{ t("EditAccountForm.error.mismatch_email_verification_code") }}
         </v-alert>
         <!-- the email updated -->
         <v-alert
@@ -120,7 +124,7 @@
           class="my-2"
           variant="outlined"
         >
-          zzz
+          {{ t("EditAccountForm.success.update_email") }}
         </v-alert>
         <!-- An error occurred while updating the email -->
         <v-alert
@@ -130,7 +134,7 @@
           class="my-2"
           variant="outlined"
         >
-          TTT
+          {{ t("EditAccountForm.error.update_email") }}
         </v-alert>
         <v-divider class="my-3"></v-divider>
       </v-container>

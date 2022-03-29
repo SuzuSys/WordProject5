@@ -1,5 +1,4 @@
 {
-  "label": "日本語",
   "AppChild": {
     "sentence": {
       "translation": "言語"
@@ -9,6 +8,26 @@
     },
     "method": {
       "load_user_info": "再取得する"
+    }
+  },
+  "EditAccountForm": {
+    "error": {
+      "request_resend_email_verification_code": "検証コードのリクエスト中にエラーが発生しました。",
+      "mismatch_email_verification_code": "検証コードが一致しません。",
+      "update_email": "E-mail の更新中にエラーが発生しました。"
+    },
+    "success": {
+      "update_email": "E-mail を更新しました。"
+    },
+    "warning": {
+      "email_not_verified_yet": "E-mail がまだ検証されていません。verificationemail.com からのメールに記載されている検証コードを次のフォームに入力してください。"
+    },
+    "info": {
+      "sent_email_verification_code": "検証コードを E-mail に送信しました。verificationemail.com からのメールに記載されている検証コードを次のフォームに入力してください。",
+      "sent_email_verification_code_again": "検証コードを再送しました。"
+    },
+    "method": {
+      "request_resend_email_verification_code": "検証コードの再送"
     }
   }
 }
