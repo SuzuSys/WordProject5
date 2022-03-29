@@ -14,10 +14,13 @@
     "error": {
       "request_resend_email_verification_code": "検証コードのリクエスト中にエラーが発生しました。",
       "mismatch_email_verification_code": "検証コードが一致しません。",
-      "update_email": "E-mail の更新中にエラーが発生しました。"
+      "update_email": "E-mail の更新中にエラーが発生しました。",
+      "password_incorrect": "Old Password が違います。",
+      "change_password": "Password の変更中にエラーが発生しました。"
     },
     "success": {
-      "update_email": "E-mail を更新しました。"
+      "update_email": "E-mail を更新しました。",
+      "change_password": "Password を変更しました。"
     },
     "warning": {
       "email_not_verified_yet": "E-mail がまだ検証されていません。verificationemail.com からのメールに記載されている検証コードを次のフォームに入力してください。"

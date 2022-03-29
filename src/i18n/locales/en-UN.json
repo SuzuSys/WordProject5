@@ -14,10 +14,13 @@
     "error": {
       "request_resend_email_verification_code": "An error occurred while requesting to resend the verification code.",
       "mismatch_email_verification_code": "The code does not match.",
-      "update_email": "An error occurred while updating the email."
+      "update_email": "An error occurred while updating the email.",
+      "password_incorrect": "Old password is incorrect.",
+      "change_password": "An error occurred while changeing the password."
     },
     "success": {
-      "update_email": "Updated the email."
+      "update_email": "The email updated.",
+      "change_password": "The password changed."
     },
     "warning": {
       "email_not_verified_yet": "Your email has not been verified yet. Please open the email from verificationemail.com and input the code in the following form."

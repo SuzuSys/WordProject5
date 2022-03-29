@@ -19,9 +19,12 @@ declare module "vue-i18n" {
         request_resend_email_verification_code: string;
         mismatch_email_verification_code: string;
         update_email: string;
+        password_incorrect: string;
+        change_password: string;
       };
       success: {
         update_email: string;
+        change_password: string;
       };
       warning: {
         email_not_verified_yet: string;

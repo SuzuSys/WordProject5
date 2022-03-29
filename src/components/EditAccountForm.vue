@@ -218,7 +218,7 @@
           class="my-2"
           variant="outlined"
         >
-          updated Password
+          {{ t("EditAccountForm.success.change_password") }}
         </v-alert>
         <!-- incorrect password -->
         <v-alert
@@ -228,7 +228,7 @@
           class="my-2"
           variant="outlined"
         >
-          PasswordIncorrect
+          {{ t("EditAccountForm.error.password_incorrect") }}
         </v-alert>
         <!-- An error occurred while updating the password -->
         <v-alert
@@ -238,7 +238,7 @@
           class="my-2"
           variant="outlined"
         >
-          error
+          {{ t("EditAccountForm.error.change_password") }}
         </v-alert>
       </v-container>
     </v-card-actions>
