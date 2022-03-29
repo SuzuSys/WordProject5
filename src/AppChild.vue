@@ -153,12 +153,13 @@ export default defineComponent({
       state.disabled.btn.reload_user_info = true;
       try {
         const user = await Auth.currentUserInfo();
-        user_store.init(
-          user.attributes.email,
-          user.attributes.email_verified,
-          user.attributes.name,
-          user.attributes["custom:language"]
-        );
+        const {
+          email,
+          email_verified,
+          name,
+          "custom:language": language,
+        } = user.attributes;
+        user_store.init(email, email_verified, name, language);
         locale.value = user_store.language;
         state.show.alert.error.load_user_info = false;
         state.show.router_view.loaded_user_info = true;
