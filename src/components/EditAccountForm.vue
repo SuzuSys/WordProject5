@@ -136,7 +136,100 @@
         >
           {{ t("EditAccountForm.error.update_email") }}
         </v-alert>
-        <v-divider class="my-3"></v-divider>
+        <!-- change password btn -->
+        <v-btn
+          @click="switchChangePasswordForm"
+          variant="outlined"
+          block
+          class="my-2 mx-0"
+        >
+          {{ state.show.form.change_password ? "cancel" : "change password" }}
+        </v-btn>
+        <!-- change password form -->
+        <v-form v-show="state.show.form.change_password">
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                v-model="state.model.text_field.password_old"
+                :append-icon="
+                  state.show_password_old ? 'mdi-eye' : 'mdi-eye-off'
+                "
+                :type="state.show_password_old ? 'text' : 'password'"
+                density="compact"
+                variant="outlined"
+                hide-details="auto"
+                label="Old Password"
+                hint="At least 8 characters"
+                counter
+                @click:append="
+                  state.show_password_old = !state.show_password_old
+                "
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                v-model="state.model.text_field.password_new"
+                :append-icon="
+                  state.show_password_new ? 'mdi-eye' : 'mdi-eye-off'
+                "
+                :type="state.show_password_new ? 'text' : 'password'"
+                density="compact"
+                variant="outlined"
+                hide-details="auto"
+                label="New Password"
+                hint="At least 8 characters"
+                counter
+                @click:append="
+                  state.show_password_new = !state.show_password_new
+                "
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="9"></v-col>
+            <v-col cols="3" class="pl-0 d-flex justify-center align-center">
+              <v-btn
+                variant="outlined"
+                @click="changePassword"
+                :disabled="state.disabled.btn.change_password"
+              >
+                Submit
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-form>
+        <!-- the password updated -->
+        <v-alert
+          type="success"
+          v-show="state.show.alert.success.change_password"
+          density="compact"
+          class="my-2"
+          variant="outlined"
+        >
+          updated Password
+        </v-alert>
+        <!-- incorrect password -->
+        <v-alert
+          type="error"
+          v-show="state.show.alert.error.incorrect_password"
+          density="compact"
+          class="my-2"
+          variant="outlined"
+        >
+          PasswordIncorrect
+        </v-alert>
+        <!-- An error occurred while updating the password -->
+        <v-alert
+          type="error"
+          v-show="state.show.alert.error.change_password"
+          density="compact"
+          class="my-2"
+          variant="outlined"
+        >
+          error
+        </v-alert>
       </v-container>
     </v-card-actions>
   </v-card>
@@ -149,10 +242,14 @@ import { Auth } from "aws-amplify";
 import { useUserStore } from "@/stores/user";
 
 interface State {
+  show_password_old: boolean;
+  show_password_new: boolean;
   model: {
     text_field: {
       email: string;
       email_verification_code: string;
+      password_old: string;
+      password_new: string;
     };
   };
   disabled: {
@@ -160,12 +257,14 @@ interface State {
       update_email: boolean;
       send_email_verification_code: boolean;
       request_resend_email_verification_code: boolean;
+      change_password: boolean;
     };
   };
   show: {
     alert: {
       success: {
         update_email: boolean;
+        change_password: boolean;
       };
       info: {
         sent_email_verification_code: boolean;
@@ -178,7 +277,12 @@ interface State {
         request_resend_email_verification_code: boolean;
         mismatch_email_verification_code: boolean;
         update_email: boolean;
+        incorrect_password: boolean;
+        change_password: boolean;
       };
+    };
+    form: {
+      change_password: boolean;
     };
     form$btn: {
       email_verification_code: boolean;
@@ -198,10 +302,14 @@ export default defineComponent({
     const userstore = useUserStore();
     // state setting
     const state: State = reactive<State>({
+      show_password_new: false,
+      show_password_old: false,
       model: {
         text_field: {
           email: userstore.email,
           email_verification_code: "",
+          password_new: "",
+          password_old: "",
         },
       },
       disabled: {
@@ -209,12 +317,14 @@ export default defineComponent({
           update_email: false,
           send_email_verification_code: false,
           request_resend_email_verification_code: false,
+          change_password: false,
         },
       },
       show: {
         alert: {
           success: {
             update_email: false,
+            change_password: false,
           },
           info: {
             sent_email_verification_code: false,
@@ -227,10 +337,15 @@ export default defineComponent({
             request_resend_email_verification_code: false,
             mismatch_email_verification_code: false,
             update_email: false,
+            incorrect_password: false,
+            change_password: false,
           },
         },
         form$btn: {
           email_verification_code: !userstore.email_verified,
+        },
+        form: {
+          change_password: false,
         },
       },
     });
@@ -317,6 +432,50 @@ export default defineComponent({
         state.disabled.btn.request_resend_email_verification_code = false;
       }
     }
+    function switchChangePasswordForm(): void {
+      if (state.show.form.change_password) {
+        state.model.text_field.password_old = "";
+        state.model.text_field.password_new = "";
+        state.show_password_old = false;
+        state.show_password_new = false;
+      }
+      state.show.form.change_password = !state.show.form.change_password;
+    }
+    async function changePassword(): Promise<void> {
+      state.disabled.btn.change_password = true;
+
+      state.show.alert.success.change_password =
+        state.show.alert.error.incorrect_password =
+        state.show.alert.error.change_password =
+          false;
+      try {
+        const user = await Auth.currentAuthenticatedUser();
+        const result = await Auth.changePassword(
+          user,
+          state.model.text_field.password_old,
+          state.model.text_field.password_new
+        );
+        if (result === "SUCCESS") {
+          state.show.alert.success.change_password = true;
+          state.show.form.change_password = false;
+          state.model.text_field.password_old = "";
+          state.model.text_field.password_new = "";
+          state.show_password_old = false;
+          state.show_password_new = false;
+        } else {
+          throw Error(result);
+        }
+      } catch (e) {
+        if (e instanceof Error && e.name === "NotAuthorizedException") {
+          state.show.alert.error.incorrect_password = true;
+        } else {
+          console.error(e);
+          state.show.alert.error.change_password = true;
+        }
+      } finally {
+        state.disabled.btn.change_password = false;
+      }
+    }
     //
     return {
       t,
@@ -324,6 +483,8 @@ export default defineComponent({
       updateEmail,
       sendEmailVerificationCode,
       requestResendVerificationCode,
+      switchChangePasswordForm,
+      changePassword,
     };
   },
 });
