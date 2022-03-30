@@ -85,6 +85,7 @@ import { useI18n } from "vue-i18n";
 import { language_key_to_label } from "@/i18n";
 import { RouterView, useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/user";
+import type { LanguageKeyUnion, LanguageLabelUnion } from "@/i18n";
 
 interface State {
   model_value: {
@@ -164,8 +165,11 @@ export default defineComponent({
       },
     });
     // list_languages
-    const list_languages: { value: string; label: string }[] = [];
-    language_key_to_label.forEach((key, label) => {
+    const list_languages: {
+      value: LanguageKeyUnion;
+      label: LanguageLabelUnion;
+    }[] = [];
+    language_key_to_label.forEach((label, key) => {
       list_languages.push({ value: key, label });
     });
     // UserStore setting
