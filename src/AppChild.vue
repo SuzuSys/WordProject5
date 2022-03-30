@@ -165,9 +165,9 @@ export default defineComponent({
     });
     // list_languages
     const list_languages: { value: string; label: string }[] = [];
-    for (const [key, value] of Object.entries(language_labels)) {
-      list_languages.push({ value: key, label: value });
-    }
+    language_labels.forEach((key, label) => {
+      list_languages.push({ value: key, label });
+    });
     // UserStore setting
     const user_store = useUserStore();
     asyncLoadUser();
