@@ -82,7 +82,7 @@
 import { defineComponent, reactive } from "vue";
 import { Auth } from "aws-amplify";
 import { useI18n } from "vue-i18n";
-import { list_languages } from "@/i18n";
+import { bijection_languages } from "@/i18n";
 import { RouterView, useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/user";
 
@@ -163,6 +163,11 @@ export default defineComponent({
         },
       },
     });
+    // list_languages
+    const list_languages: { value: string; label: string }[] = [];
+    for (const [key, value] of Object.entries(bijection_languages)) {
+      list_languages.push({ value: key, label: value });
+    }
     // UserStore setting
     const user_store = useUserStore();
     asyncLoadUser();
