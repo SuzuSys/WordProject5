@@ -82,7 +82,7 @@
 import { defineComponent, reactive } from "vue";
 import { Auth } from "aws-amplify";
 import { useI18n } from "vue-i18n";
-import { language_labels } from "@/i18n";
+import { language_key_to_label } from "@/i18n";
 import { RouterView, useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/user";
 
@@ -165,7 +165,7 @@ export default defineComponent({
     });
     // list_languages
     const list_languages: { value: string; label: string }[] = [];
-    language_labels.forEach((key, label) => {
+    language_key_to_label.forEach((key, label) => {
       list_languages.push({ value: key, label });
     });
     // UserStore setting
