@@ -32,5 +32,15 @@
     "method": {
       "request_resend_email_verification_code": "Request to resend the code"
     }
+  },
+  "EditProfileForm": {
+    "error": {
+      "change_name": "An error occurred while changing your name.",
+      "change_language": "An error occurred while changing your language."
+    },
+    "success": {
+      "change_name": "Your name changed.",
+      "change_language": "Your language changed."
+    }
   }
 }

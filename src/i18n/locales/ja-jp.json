@@ -32,5 +32,15 @@
     "method": {
       "request_resend_email_verification_code": "検証コードの再送"
     }
+  },
+  "EditProfileForm": {
+    "error": {
+      "change_name": "name の変更中にエラーが発生しました。",
+      "change_language": "language の変更中にエラーが発生しました。"
+    },
+    "success": {
+      "change_name": "name が変更されました。",
+      "change_language": "language が変更されました。"
+    }
   }
 }

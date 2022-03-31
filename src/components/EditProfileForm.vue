@@ -35,7 +35,7 @@
           class="my-2"
           variant="outlined"
         >
-          changed name
+          {{ t("EditProfileForm.success.change_name") }}
         </v-alert>
         <!-- An error occurred while updating the name. -->
         <v-alert
@@ -45,7 +45,7 @@
           class="my-2"
           variant="outlined"
         >
-          error occurred while changing name
+          {{ t("EditProfileForm.error.change_name") }}
         </v-alert>
         <!-- Language -->
         <v-form>
@@ -79,7 +79,7 @@
           class="my-2"
           variant="outlined"
         >
-          Change Language
+          {{ t("EditProfileForm.success.change_language") }}
         </v-alert>
         <!-- An error occurred while updating the language. -->
         <v-alert
@@ -89,7 +89,7 @@
           class="my-2"
           variant="outlined"
         >
-          An error occurred while changing language
+          {{ t("EditProfileForm.error.change_language") }}
         </v-alert>
       </v-container>
     </v-card-actions>
