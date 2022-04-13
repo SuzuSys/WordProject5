@@ -236,36 +236,3 @@ export const onDeleteFolder = /* GraphQL */ `
     }
   }
 `;
-export const onCreateSchemaTest2 = /* GraphQL */ `
-  subscription OnCreateSchemaTest2($owner: String) {
-    onCreateSchemaTest2(owner: $owner) {
-      id
-      name
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const onUpdateSchemaTest2 = /* GraphQL */ `
-  subscription OnUpdateSchemaTest2($owner: String) {
-    onUpdateSchemaTest2(owner: $owner) {
-      id
-      name
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const onDeleteSchemaTest2 = /* GraphQL */ `
-  subscription OnDeleteSchemaTest2($owner: String) {
-    onDeleteSchemaTest2(owner: $owner) {
-      id
-      name
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;

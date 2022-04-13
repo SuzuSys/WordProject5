@@ -199,32 +199,3 @@ export const listFolders = /* GraphQL */ `
     }
   }
 `;
-export const getSchemaTest2 = /* GraphQL */ `
-  query GetSchemaTest2($id: ID!) {
-    getSchemaTest2(id: $id) {
-      id
-      name
-      createdAt
-      updatedAt
-      owner
-    }
-  }
-`;
-export const listSchemaTest2s = /* GraphQL */ `
-  query ListSchemaTest2s(
-    $filter: ModelSchemaTest2FilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    listSchemaTest2s(filter: $filter, limit: $limit, nextToken: $nextToken) {
-      items {
-        id
-        name
-        createdAt
-        updatedAt
-        owner
-      }
-      nextToken
-    }
-  }
-`;

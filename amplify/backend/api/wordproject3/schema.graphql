@@ -35,10 +35,3 @@ type Folder @model @auth(rules: [
   description: String!
   sets: [Set] @hasMany
 }
-
-type SchemaTest2 @model @auth(rules: [
-  { allow: owner }
-]) {
-  id: ID!
-  name: String!
-}
