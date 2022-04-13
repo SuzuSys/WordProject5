@@ -4,7 +4,6 @@
 
 type Word @model @searchable @auth(rules: [
   { allow: owner }
-  { allow: private, operations: [read] }
 ]) {
   id: ID!
   front: String!
@@ -14,7 +13,6 @@ type Word @model @searchable @auth(rules: [
 
 type Set @model @auth(rules: [
   { allow: owner }
-  { allow: private, operations: [read] }
 ]) {
   id: ID!
   name: String!
@@ -31,7 +29,6 @@ type Set @model @auth(rules: [
 
 type Folder @model @auth(rules: [
   { allow: owner }
-  { allow: private, operations: [read] }
 ]) {
   id: ID!
   name: String!
