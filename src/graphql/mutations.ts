@@ -75,13 +75,10 @@ export const createSet = /* GraphQL */ `
         }
         nextToken
       }
-      limit
       average
-      calculated_average
       alpha
       front_language
       back_language
-      searchable_minimum
       createdAt
       updatedAt
       folderSetsId
@@ -111,13 +108,10 @@ export const updateSet = /* GraphQL */ `
         }
         nextToken
       }
-      limit
       average
-      calculated_average
       alpha
       front_language
       back_language
-      searchable_minimum
       createdAt
       updatedAt
       folderSetsId
@@ -147,13 +141,10 @@ export const deleteSet = /* GraphQL */ `
         }
         nextToken
       }
-      limit
       average
-      calculated_average
       alpha
       front_language
       back_language
-      searchable_minimum
       createdAt
       updatedAt
       folderSetsId
@@ -175,13 +166,10 @@ export const createFolder = /* GraphQL */ `
           id
           name
           description
-          limit
           average
-          calculated_average
           alpha
           front_language
           back_language
-          searchable_minimum
           createdAt
           updatedAt
           folderSetsId
@@ -209,13 +197,10 @@ export const updateFolder = /* GraphQL */ `
           id
           name
           description
-          limit
           average
-          calculated_average
           alpha
           front_language
           back_language
-          searchable_minimum
           createdAt
           updatedAt
           folderSetsId
@@ -243,13 +228,10 @@ export const deleteFolder = /* GraphQL */ `
           id
           name
           description
-          limit
           average
-          calculated_average
           alpha
           front_language
           back_language
-          searchable_minimum
           createdAt
           updatedAt
           folderSetsId
