@@ -45,7 +45,7 @@
             </v-btn>
           </v-col>
         </v-row>
-        <v-list two-line v-model:selected="state.test.model">
+        <v-list two-line @click:select="getModel">
           <v-list-item
             v-for="(folder, i) in folders"
             :key="i"
@@ -75,9 +75,6 @@
             </template>
           </v-list-item>
         </v-list>
-        <v-btn @click="lookModel" variant="outlined" block class="my-2 mx-0">
-          look value
-        </v-btn>
       </v-container>
     </v-card-actions>
   </v-card>
@@ -98,9 +95,6 @@ interface State {
       edit_folder: boolean;
     };
   };
-  test: {
-    model: object[] | undefined;
-  };
 }
 
 interface Folders {
@@ -113,6 +107,7 @@ interface ListFoldersResult {
   data: {
     listFolders: {
       items: Folders[];
+      nextToken: string | null;
     };
   };
 }
@@ -135,29 +130,39 @@ export default defineComponent({
           edit_folder: false,
         },
       },
-      test: {
-        model: undefined,
-      },
     });
     // folders setting
     const folders = ref<Folders[]>([]);
     callListFolders();
     // graphql method
-    function lookModel(): void {
-      console.log(state.test.model ? state.test.model[0] : undefined);
-    }
     async function callListFolders(): Promise<void> {
       try {
         const result = await (API.graphql({
           query: listFolders,
           authMode: "AMAZON_COGNITO_USER_POOLS",
         }) as Promise<ListFoldersResult>);
-        const result_folders = result.data.listFolders.items;
+        let result_folders = result.data.listFolders.items;
+        let nextToken: string | null = result.data.listFolders.nextToken;
+        while (nextToken) {
+          const r = await (API.graphql({
+            query: listFolders,
+            variables: {
+              nextToken,
+            },
+            authMode: "AMAZON_COGNITO_USER_POOLS",
+          }) as Promise<ListFoldersResult>);
+          result_folders = result_folders.concat(r.data.listFolders.items);
+          nextToken = r.data.listFolders.nextToken;
+          console.log(nextToken);
+        }
         result_folders.sort((a, b) => (a.name < b.name ? -1 : 1));
         folders.value = result_folders;
       } catch (e) {
         console.error(e);
       }
+    }
+    function getModel(value: { id: string }) {
+      console.log(value.id);
     }
     //
     return {
@@ -165,7 +170,7 @@ export default defineComponent({
       state,
       folders,
       callListFolders,
-      lookModel,
+      getModel,
     };
   },
 });
