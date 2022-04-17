@@ -209,13 +209,13 @@ export default defineComponent({
       state.show.alert.error.change_language = false;
       try {
         if (!state.model.select.selected_language_label) {
-          throw Error("selected language is undefined.");
+          throw Error(`selected language is undefined.`);
         }
         const selected_language = language_label_to_key.get(
           state.model.select.selected_language_label
         );
         if (!selected_language) {
-          throw Error("selected language is not in language list.");
+          throw Error(`selected language is not in language list.`);
         }
         const user = await Auth.currentAuthenticatedUser();
         const result = await Auth.updateUserAttributes(user, {
