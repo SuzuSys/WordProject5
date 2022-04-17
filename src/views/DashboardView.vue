@@ -5,7 +5,7 @@
     </v-btn>
     <v-toolbar-title>Title</v-toolbar-title>
   </v-toolbar>
-  <folder-form></folder-form>
+  <folder-form @get-folder-data="getFolder"></folder-form>
 </template>
 
 <script lang="ts">
@@ -14,6 +14,14 @@ import FolderForm from "@/components/FolderForm.vue";
 
 export default defineComponent({
   name: "AccountView",
+  setup() {
+    function getFolder(message: object) {
+      console.log(message);
+    }
+    return {
+      getFolder,
+    };
+  },
   components: {
     FolderForm,
   },

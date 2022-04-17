@@ -114,7 +114,8 @@ interface ListFoldersResult {
 
 export default defineComponent({
   name: "FolderForm",
-  setup() {
+  emits: ["getFolderData"],
+  setup(_, { emit }) {
     // Translation Setting
     const { t } = useI18n({
       useScope: "global",
@@ -137,32 +138,31 @@ export default defineComponent({
     // graphql method
     async function callListFolders(): Promise<void> {
       try {
-        const result = await (API.graphql({
+        let { data } = await (API.graphql({
           query: listFolders,
           authMode: "AMAZON_COGNITO_USER_POOLS",
         }) as Promise<ListFoldersResult>);
-        let result_folders = result.data.listFolders.items;
-        let nextToken: string | null = result.data.listFolders.nextToken;
+        let { items, nextToken } = data.listFolders;
         while (nextToken) {
-          const r = await (API.graphql({
+          ({ data } = await (API.graphql({
             query: listFolders,
             variables: {
               nextToken,
             },
             authMode: "AMAZON_COGNITO_USER_POOLS",
-          }) as Promise<ListFoldersResult>);
-          result_folders = result_folders.concat(r.data.listFolders.items);
-          nextToken = r.data.listFolders.nextToken;
-          console.log(nextToken);
+          }) as Promise<ListFoldersResult>));
+          items = items.concat(data.listFolders.items);
+          ({ nextToken } = data.listFolders);
         }
-        result_folders.sort((a, b) => (a.name < b.name ? -1 : 1));
-        folders.value = result_folders;
+        items.sort((a, b) => (a.name < b.name ? -1 : 1));
+        folders.value = items;
       } catch (e) {
         console.error(e);
       }
     }
-    function getModel(value: { id: string }) {
+    function getModel(value: { id: object }) {
       console.log(value.id);
+      emit("getFolderData", value.id);
     }
     //
     return {
