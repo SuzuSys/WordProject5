@@ -1,3 +1,237 @@
+<script setup lang="ts">
+import { reactive } from "vue";
+import { useI18n } from "vue-i18n";
+import { Auth } from "aws-amplify";
+import { useUserStore } from "@/stores/user";
+
+// interface
+interface State {
+  show_password_old: boolean;
+  show_password_new: boolean;
+  model: {
+    text_field: {
+      email: string;
+      email_verification_code: string;
+      password_old: string;
+      password_new: string;
+    };
+  };
+  disabled: {
+    btn: {
+      update_email: boolean;
+      send_email_verification_code: boolean;
+      request_resend_email_verification_code: boolean;
+      change_password: boolean;
+    };
+  };
+  show: {
+    alert: {
+      success: {
+        update_email: boolean;
+        change_password: boolean;
+      };
+      info: {
+        sent_email_verification_code: boolean;
+        sent_email_verification_code_again: boolean;
+      };
+      warning: {
+        email_not_verified_yet: boolean;
+      };
+      error: {
+        request_resend_email_verification_code: boolean;
+        mismatch_email_verification_code: boolean;
+        update_email: boolean;
+        incorrect_password: boolean;
+        change_password: boolean;
+      };
+    };
+    form: {
+      change_password: boolean;
+    };
+    form$btn: {
+      email_verification_code: boolean;
+    };
+  };
+}
+
+// Translation Setting
+const { t } = useI18n({
+  useScope: "global",
+  inheritLocale: true,
+});
+// UserStore setting
+const userstore = useUserStore();
+// state setting
+const state: State = reactive<State>({
+  show_password_new: false,
+  show_password_old: false,
+  model: {
+    text_field: {
+      email: userstore.email,
+      email_verification_code: "",
+      password_new: "",
+      password_old: "",
+    },
+  },
+  disabled: {
+    btn: {
+      update_email: false,
+      send_email_verification_code: false,
+      request_resend_email_verification_code: false,
+      change_password: false,
+    },
+  },
+  show: {
+    alert: {
+      success: {
+        update_email: false,
+        change_password: false,
+      },
+      info: {
+        sent_email_verification_code: false,
+        sent_email_verification_code_again: false,
+      },
+      warning: {
+        email_not_verified_yet: !userstore.email_verified,
+      },
+      error: {
+        request_resend_email_verification_code: false,
+        mismatch_email_verification_code: false,
+        update_email: false,
+        incorrect_password: false,
+        change_password: false,
+      },
+    },
+    form$btn: {
+      email_verification_code: !userstore.email_verified,
+    },
+    form: {
+      change_password: false,
+    },
+  },
+});
+// method setting
+async function updateEmail(): Promise<void> {
+  state.disabled.btn.update_email = true;
+  state.show.alert.info.sent_email_verification_code =
+    state.show.alert.warning.email_not_verified_yet =
+    state.show.form$btn.email_verification_code =
+    state.show.alert.info.sent_email_verification_code_again =
+    state.show.alert.error.request_resend_email_verification_code =
+    state.show.alert.error.mismatch_email_verification_code =
+    state.show.alert.success.update_email =
+    state.show.alert.error.update_email =
+      false;
+  try {
+    const user = await Auth.currentAuthenticatedUser();
+    const result = await Auth.updateUserAttributes(user, {
+      email: state.model.text_field.email,
+    });
+    if (result === "SUCCESS") {
+      state.show.alert.info.sent_email_verification_code = true;
+      state.show.form$btn.email_verification_code = true;
+      userstore.email = state.model.text_field.email;
+      userstore.email_verified = false;
+    } else {
+      throw Error(result);
+    }
+  } catch (e) {
+    console.error(e);
+    state.show.alert.error.update_email = true;
+  } finally {
+    state.disabled.btn.update_email = false;
+  }
+}
+async function sendEmailVerificationCode(): Promise<void> {
+  state.disabled.btn.send_email_verification_code = true;
+  state.show.alert.success.update_email =
+    state.show.alert.error.update_email =
+    state.show.alert.error.mismatch_email_verification_code =
+      false;
+  try {
+    const result = await Auth.verifyCurrentUserAttributeSubmit(
+      "email",
+      state.model.text_field.email_verification_code
+    );
+    if (result === "SUCCESS") {
+      state.show.alert.success.update_email = true;
+      userstore.email_verified = true;
+      state.show.form$btn.email_verification_code =
+        state.show.alert.info.sent_email_verification_code =
+        state.show.alert.info.sent_email_verification_code_again =
+        state.show.alert.error.request_resend_email_verification_code =
+        state.show.alert.warning.email_not_verified_yet =
+          false;
+    } else {
+      throw Error(result);
+    }
+  } catch (e) {
+    if (e instanceof Error && e.name === "CodeMismatchException") {
+      state.show.alert.error.mismatch_email_verification_code = true;
+    } else {
+      console.error(e);
+      state.show.alert.error.update_email;
+    }
+  } finally {
+    state.disabled.btn.send_email_verification_code = false;
+  }
+}
+async function requestResendVerificationCode(): Promise<void> {
+  state.disabled.btn.request_resend_email_verification_code = true;
+  state.show.alert.info.sent_email_verification_code_again = false;
+  state.show.alert.error.request_resend_email_verification_code = false;
+  try {
+    await Auth.verifyCurrentUserAttribute("email");
+    state.show.alert.info.sent_email_verification_code_again = true;
+  } catch (e) {
+    console.error(e);
+    state.show.alert.error.request_resend_email_verification_code = true;
+  } finally {
+    state.disabled.btn.request_resend_email_verification_code = false;
+  }
+}
+function closeChangePasswordForm(): void {
+  state.model.text_field.password_old = "";
+  state.model.text_field.password_new = "";
+  state.show_password_old = false;
+  state.show_password_new = false;
+  state.show.form.change_password = false;
+}
+async function changePassword(): Promise<void> {
+  state.disabled.btn.change_password = true;
+  state.show.alert.success.change_password =
+    state.show.alert.error.incorrect_password =
+    state.show.alert.error.change_password =
+      false;
+  try {
+    const user = await Auth.currentAuthenticatedUser();
+    const result = await Auth.changePassword(
+      user,
+      state.model.text_field.password_old,
+      state.model.text_field.password_new
+    );
+    if (result === "SUCCESS") {
+      state.show.alert.success.change_password = true;
+      state.show.form.change_password = false;
+      state.model.text_field.password_old = "";
+      state.model.text_field.password_new = "";
+      state.show_password_old = false;
+      state.show_password_new = false;
+    } else {
+      throw Error(result);
+    }
+  } catch (e) {
+    if (e instanceof Error && e.name === "NotAuthorizedException") {
+      state.show.alert.error.incorrect_password = true;
+    } else {
+      console.error(e);
+      state.show.alert.error.change_password = true;
+    }
+  } finally {
+    state.disabled.btn.change_password = false;
+  }
+}
+</script>
 <template>
   <v-card class="mx-auto my-12" max-width="500" variant="outlined">
     <v-card-title>Edit Account</v-card-title>
@@ -244,256 +478,3 @@
     </v-card-actions>
   </v-card>
 </template>
-
-<script lang="ts">
-import { defineComponent, reactive } from "vue";
-import { useI18n } from "vue-i18n";
-import { Auth } from "aws-amplify";
-import { useUserStore } from "@/stores/user";
-
-interface State {
-  show_password_old: boolean;
-  show_password_new: boolean;
-  model: {
-    text_field: {
-      email: string;
-      email_verification_code: string;
-      password_old: string;
-      password_new: string;
-    };
-  };
-  disabled: {
-    btn: {
-      update_email: boolean;
-      send_email_verification_code: boolean;
-      request_resend_email_verification_code: boolean;
-      change_password: boolean;
-    };
-  };
-  show: {
-    alert: {
-      success: {
-        update_email: boolean;
-        change_password: boolean;
-      };
-      info: {
-        sent_email_verification_code: boolean;
-        sent_email_verification_code_again: boolean;
-      };
-      warning: {
-        email_not_verified_yet: boolean;
-      };
-      error: {
-        request_resend_email_verification_code: boolean;
-        mismatch_email_verification_code: boolean;
-        update_email: boolean;
-        incorrect_password: boolean;
-        change_password: boolean;
-      };
-    };
-    form: {
-      change_password: boolean;
-    };
-    form$btn: {
-      email_verification_code: boolean;
-    };
-  };
-}
-
-export default defineComponent({
-  name: "EditAccountForm",
-  setup() {
-    // Translation Setting
-    const { t } = useI18n({
-      useScope: "global",
-      inheritLocale: true,
-    });
-    // UserStore setting
-    const userstore = useUserStore();
-    // state setting
-    const state: State = reactive<State>({
-      show_password_new: false,
-      show_password_old: false,
-      model: {
-        text_field: {
-          email: userstore.email,
-          email_verification_code: "",
-          password_new: "",
-          password_old: "",
-        },
-      },
-      disabled: {
-        btn: {
-          update_email: false,
-          send_email_verification_code: false,
-          request_resend_email_verification_code: false,
-          change_password: false,
-        },
-      },
-      show: {
-        alert: {
-          success: {
-            update_email: false,
-            change_password: false,
-          },
-          info: {
-            sent_email_verification_code: false,
-            sent_email_verification_code_again: false,
-          },
-          warning: {
-            email_not_verified_yet: !userstore.email_verified,
-          },
-          error: {
-            request_resend_email_verification_code: false,
-            mismatch_email_verification_code: false,
-            update_email: false,
-            incorrect_password: false,
-            change_password: false,
-          },
-        },
-        form$btn: {
-          email_verification_code: !userstore.email_verified,
-        },
-        form: {
-          change_password: false,
-        },
-      },
-    });
-    // method setting
-    async function updateEmail(): Promise<void> {
-      state.disabled.btn.update_email = true;
-
-      state.show.alert.info.sent_email_verification_code =
-        state.show.alert.warning.email_not_verified_yet =
-        state.show.form$btn.email_verification_code =
-        state.show.alert.info.sent_email_verification_code_again =
-        state.show.alert.error.request_resend_email_verification_code =
-        state.show.alert.error.mismatch_email_verification_code =
-        state.show.alert.success.update_email =
-        state.show.alert.error.update_email =
-          false;
-      try {
-        const user = await Auth.currentAuthenticatedUser();
-        const result = await Auth.updateUserAttributes(user, {
-          email: state.model.text_field.email,
-        });
-        if (result === "SUCCESS") {
-          state.show.alert.info.sent_email_verification_code = true;
-          state.show.form$btn.email_verification_code = true;
-          userstore.email = state.model.text_field.email;
-          userstore.email_verified = false;
-        } else {
-          throw Error(result);
-        }
-      } catch (e) {
-        console.error(e);
-        state.show.alert.error.update_email = true;
-      } finally {
-        state.disabled.btn.update_email = false;
-      }
-    }
-    async function sendEmailVerificationCode(): Promise<void> {
-      state.disabled.btn.send_email_verification_code = true;
-
-      state.show.alert.success.update_email =
-        state.show.alert.error.update_email =
-        state.show.alert.error.mismatch_email_verification_code =
-          false;
-      try {
-        const result = await Auth.verifyCurrentUserAttributeSubmit(
-          "email",
-          state.model.text_field.email_verification_code
-        );
-        if (result === "SUCCESS") {
-          state.show.alert.success.update_email = true;
-          userstore.email_verified = true;
-          state.show.form$btn.email_verification_code =
-            state.show.alert.info.sent_email_verification_code =
-            state.show.alert.info.sent_email_verification_code_again =
-            state.show.alert.error.request_resend_email_verification_code =
-            state.show.alert.warning.email_not_verified_yet =
-              false;
-        } else {
-          throw Error(result);
-        }
-      } catch (e) {
-        if (e instanceof Error && e.name === "CodeMismatchException") {
-          state.show.alert.error.mismatch_email_verification_code = true;
-        } else {
-          console.error(e);
-          state.show.alert.error.update_email;
-        }
-      } finally {
-        state.disabled.btn.send_email_verification_code = false;
-      }
-    }
-    async function requestResendVerificationCode(): Promise<void> {
-      state.disabled.btn.request_resend_email_verification_code = true;
-
-      state.show.alert.info.sent_email_verification_code_again = false;
-      state.show.alert.error.request_resend_email_verification_code = false;
-      try {
-        await Auth.verifyCurrentUserAttribute("email");
-        state.show.alert.info.sent_email_verification_code_again = true;
-      } catch (e) {
-        console.error(e);
-        state.show.alert.error.request_resend_email_verification_code = true;
-      } finally {
-        state.disabled.btn.request_resend_email_verification_code = false;
-      }
-    }
-    function closeChangePasswordForm(): void {
-      state.model.text_field.password_old = "";
-      state.model.text_field.password_new = "";
-      state.show_password_old = false;
-      state.show_password_new = false;
-      state.show.form.change_password = false;
-    }
-    async function changePassword(): Promise<void> {
-      state.disabled.btn.change_password = true;
-
-      state.show.alert.success.change_password =
-        state.show.alert.error.incorrect_password =
-        state.show.alert.error.change_password =
-          false;
-      try {
-        const user = await Auth.currentAuthenticatedUser();
-        const result = await Auth.changePassword(
-          user,
-          state.model.text_field.password_old,
-          state.model.text_field.password_new
-        );
-        if (result === "SUCCESS") {
-          state.show.alert.success.change_password = true;
-          state.show.form.change_password = false;
-          state.model.text_field.password_old = "";
-          state.model.text_field.password_new = "";
-          state.show_password_old = false;
-          state.show_password_new = false;
-        } else {
-          throw Error(result);
-        }
-      } catch (e) {
-        if (e instanceof Error && e.name === "NotAuthorizedException") {
-          state.show.alert.error.incorrect_password = true;
-        } else {
-          console.error(e);
-          state.show.alert.error.change_password = true;
-        }
-      } finally {
-        state.disabled.btn.change_password = false;
-      }
-    }
-    //
-    return {
-      t,
-      state,
-      updateEmail,
-      sendEmailVerificationCode,
-      requestResendVerificationCode,
-      closeChangePasswordForm,
-      changePassword,
-    };
-  },
-});
-</script>
