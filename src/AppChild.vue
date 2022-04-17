@@ -1,3 +1,141 @@
+<script setup lang="ts">
+import { reactive } from "vue";
+import { Auth } from "aws-amplify";
+import { useI18n } from "vue-i18n";
+import type { LanguageKeyUnion, LanguageLabelUnion } from "@/i18n";
+import { language_key_to_label } from "@/i18n";
+import { RouterView, useRouter, useRoute } from "vue-router";
+import { useUserStore } from "@/stores/user";
+
+// interface
+interface State {
+  model_value: {
+    overlay: {
+      loading: boolean;
+    };
+  };
+  model: {
+    drawer: {
+      show_drawer: boolean;
+    };
+    menu: {
+      show_languages_list: boolean;
+    };
+  };
+  show: {
+    alert: {
+      error: {
+        load_user_info: boolean;
+      };
+    };
+  };
+  if: {
+    router_view: {
+      loaded_user_info: boolean;
+    };
+  };
+  disabled: {
+    btn: {
+      reload_user_info: boolean;
+    };
+  };
+}
+
+// Translation Setting
+const { t, locale } = useI18n({
+  useScope: "global",
+  inheritLocale: true,
+});
+// State Setting
+const state: State = reactive<State>({
+  model_value: {
+    overlay: {
+      loading: false,
+    },
+  },
+  model: {
+    drawer: {
+      show_drawer: false,
+    },
+    menu: {
+      show_languages_list: false,
+    },
+  },
+  show: {
+    alert: {
+      error: {
+        load_user_info: false,
+      },
+    },
+  },
+  if: {
+    router_view: {
+      loaded_user_info: false,
+    },
+  },
+  disabled: {
+    btn: {
+      reload_user_info: false,
+    },
+  },
+});
+// list_languages
+const list_languages: {
+  value: LanguageKeyUnion;
+  label: LanguageLabelUnion;
+}[] = [];
+language_key_to_label.forEach((label, key) => {
+  list_languages.push({ value: key, label });
+});
+// UserStore setting
+const user_store = useUserStore();
+asyncLoadUser();
+// Method Setting
+function changeLanguage(v: string): void {
+  locale.value = v;
+  state.model.menu.show_languages_list = false;
+}
+async function asyncLoadUser(): Promise<void> {
+  state.disabled.btn.reload_user_info = true;
+  state.model_value.overlay.loading = true;
+  try {
+    const user = await Auth.currentUserInfo();
+    const {
+      email,
+      email_verified,
+      name,
+      "custom:language": language,
+    } = user.attributes;
+    user_store.init(email, email_verified, name, language);
+    locale.value = user_store.language;
+    state.show.alert.error.load_user_info = false;
+    state.model_value.overlay.loading = false;
+    state.if.router_view.loaded_user_info = true;
+  } catch (e) {
+    console.error(e);
+    state.show.alert.error.load_user_info = true;
+  } finally {
+    state.disabled.btn.reload_user_info = false;
+    state.model_value.overlay.loading = false;
+  }
+}
+// Router Method Setting
+const router = useRouter();
+const route = useRoute();
+function goAccount(): void {
+  if (route.path !== "/account") {
+    router.push({ path: "/account" });
+  }
+}
+function goDashboard(): void {
+  if (route.path !== "/dashboard") {
+    router.push({ path: "/dashboard" });
+  } else {
+    state.model.drawer.show_drawer = false;
+  }
+}
+</script>
+
 <template>
   <v-app>
     <v-app-bar app>
@@ -77,159 +215,3 @@
     </v-main>
   </v-app>
 </template>
-
-<script lang="ts">
-import { defineComponent, reactive } from "vue";
-import { Auth } from "aws-amplify";
-import { useI18n } from "vue-i18n";
-import { language_key_to_label } from "@/i18n";
-import { RouterView, useRouter, useRoute } from "vue-router";
-import { useUserStore } from "@/stores/user";
-import type { LanguageKeyUnion, LanguageLabelUnion } from "@/i18n";
-
-interface State {
-  model_value: {
-    overlay: {
-      loading: boolean;
-    };
-  };
-  model: {
-    drawer: {
-      show_drawer: boolean;
-    };
-    menu: {
-      show_languages_list: boolean;
-    };
-  };
-  show: {
-    alert: {
-      error: {
-        load_user_info: boolean;
-      };
-    };
-  };
-  if: {
-    router_view: {
-      loaded_user_info: boolean;
-    };
-  };
-  disabled: {
-    btn: {
-      reload_user_info: boolean;
-    };
-  };
-}
-
-export default defineComponent({
-  name: "AppChild",
-  components: {
-    RouterView,
-  },
-  setup() {
-    // Translation Setting
-    const { t, locale } = useI18n({
-      useScope: "global",
-      inheritLocale: true,
-    });
-    // State Setting
-    const state: State = reactive<State>({
-      model_value: {
-        overlay: {
-          loading: false,
-        },
-      },
-      model: {
-        drawer: {
-          show_drawer: false,
-        },
-        menu: {
-          show_languages_list: false,
-        },
-      },
-      show: {
-        alert: {
-          error: {
-            load_user_info: false,
-          },
-        },
-      },
-      if: {
-        router_view: {
-          loaded_user_info: false,
-        },
-      },
-      disabled: {
-        btn: {
-          reload_user_info: false,
-        },
-      },
-    });
-    // list_languages
-    const list_languages: {
-      value: LanguageKeyUnion;
-      label: LanguageLabelUnion;
-    }[] = [];
-    language_key_to_label.forEach((label, key) => {
-      list_languages.push({ value: key, label });
-    });
-    // UserStore setting
-    const user_store = useUserStore();
-    asyncLoadUser();
-    // Method Setting
-    function changeLanguage(v: string): void {
-      locale.value = v;
-      state.model.menu.show_languages_list = false;
-    }
-    async function asyncLoadUser(): Promise<void> {
-      state.disabled.btn.reload_user_info = true;
-      state.model_value.overlay.loading = true;
-      try {
-        const user = await Auth.currentUserInfo();
-        const {
-          email,
-          email_verified,
-          name,
-          "custom:language": language,
-        } = user.attributes;
-        user_store.init(email, email_verified, name, language);
-        locale.value = user_store.language;
-        state.show.alert.error.load_user_info = false;
-        state.model_value.overlay.loading = false;
-        state.if.router_view.loaded_user_info = true;
-      } catch (e) {
-        console.error(e);
-        state.show.alert.error.load_user_info = true;
-      } finally {
-        state.disabled.btn.reload_user_info = false;
-        state.model_value.overlay.loading = false;
-      }
-    }
-    // Router Method Setting
-    const router = useRouter();
-    const route = useRoute();
-    function goAccount(): void {
-      if (route.path !== "/account") {
-        router.push({ path: "/account" });
-      }
-    }
-    function goDashboard(): void {
-      if (route.path !== "/dashboard") {
-        router.push({ path: "/dashboard" });
-      } else {
-        state.model.drawer.show_drawer = false;
-      }
-    }
-    //
-    return {
-      t,
-      locale,
-      state,
-      list_languages,
-      changeLanguage,
-      asyncLoadUser,
-      goAccount,
-      goDashboard,
-    };
-  },
-});
-</script>
